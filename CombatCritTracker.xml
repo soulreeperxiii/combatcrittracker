@@ -1,0 +1,867 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd" xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="CombatCritTracker.lua" />
+	<CheckButton name="CCTCheckBoxTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0" />
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				PlaySound(857)
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+				CCT_Helper_Tooltip(self)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+	<Frame name="CCTInsetFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="BORDER">
+				<Texture parentKey="BorderTopRight" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="8"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture parentKey="BorderBottomRight" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="8"/>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0.375" bottom="0.625"/>
+				</Texture>
+				<Texture parentKey="BorderRightMiddle" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="0"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.BorderTopRight" relativePoint="BOTTOM"/>
+						<Anchor point="BOTTOM" relativeKey="$parent.BorderBottomRight" relativePoint="TOP"/>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0.25" bottom="0.375"/>
+				</Texture>
+				<Texture parentKey="BorderTopLeft" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="8"/>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture parentKey="BorderBottomLeft" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="8"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0.375" bottom="0.625"/>
+				</Texture>
+				<Texture parentKey="BorderLeftMiddle" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="0"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.BorderTopLeft" relativePoint="BOTTOMLEFT"/>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent.BorderBottomLeft" relativePoint="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0.25" bottom="0.375"/>
+				</Texture>
+				<Texture parentKey="BorderTopMiddle" file="Interface\Common\Common-Input-Border">
+					<Size x="100" y="8"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent.BorderTopRight" relativePoint="LEFT"/>
+						<Anchor point="LEFT" relativeKey="$parent.BorderTopLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture parentKey="BorderBottomMiddle" file="Interface\Common\Common-Input-Border">
+					<Size x="100" y="8"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent.BorderBottomRight" relativePoint="LEFT"/>
+						<Anchor point="LEFT" relativeKey="$parent.BorderBottomLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0.375" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="CCT_MessageFrameHelper" hidden="true" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" moveable="true" enableMouse="true">
+		<Size x="328" y="210" />
+		<Anchors>
+			<Anchor point="TOPLEFT" x="50" y="-30" />
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size x="286" y="64" />
+					<Anchors>
+						<Anchor point="TOP" x="0" y="12" />
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Message Frame Editor">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="TOP" x="0" y="-14" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontHighlight" text="Drag the frames below to move">
+					<Size x="286" y="24" />
+					<Anchors>
+						<Anchor point="TOP" x="3" y="-32" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Slider name="$parentFontSlider" inherits="OptionsSliderTemplate" minValue="8" maxValue="32" valueStep="1" ObeyStepOnDrag="true" >
+				<Size x="220" y="18" />
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="46" y="105" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."High"):SetText(32)
+						getglobal(self:GetName().."Low"):SetText(8)
+					</OnLoad>
+					<OnValueChanged>
+						CCT_FontSlider_OnValueChanged(self)
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider name="$parentBGFontSlider" inherits="OptionsSliderTemplate" minValue="8" maxValue="32" valueStep="1" ObeyStepOnDrag="true" >
+				<Size x="220" y="18" />
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="46" y="60" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."High"):SetText(32)
+						getglobal(self:GetName().."Low"):SetText(8)
+					</OnLoad>
+					<OnValueChanged>
+						CCT_BGFontSlider_OnValueChanged(self)
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Button name="$parentTestButton" inherits="OptionsButtonTemplate" text="Test">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="14" y="14" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_MessageFrameHelperTestButton_OnClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentColorButton" inherits="OptionsButtonTemplate" text="Text Color">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM" x="0" y="14" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_MessageFrameHelperColorButton_OnClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCloseButton" inherits="OptionsButtonTemplate" text="Exit Config">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT" x="-14" y="14" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_MessageFrameHelperCloseButton_OnClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForDrag("LeftButton")
+			</OnLoad>
+			<OnShow>
+				CCT_MessageFrameHelper_OnShow()
+				PlaySound(839)
+			</OnShow>
+			<OnHide>
+				PlaySound(840)
+			</OnHide>
+			<OnDragStart>
+				self:StartMoving()
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing()
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	<Frame name="CCT_RecordsConfirmFrame" hidden="true" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" moveable="false" enableMouse="true">
+		<Size x="300" y="100"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size x="300" y="64" />
+					<Anchors>
+						<Anchor point="TOP" x="0" y="12" />
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Combat Crit Tracker">
+					<Size x="300"/>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="TOP" x="0" y="-14" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontHighlight" text="Delete ALL crit records?">
+					<Size x="300" y="24" />
+					<Anchors>
+						<Anchor point="TOP" x="3" y="-32" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentYESButton" inherits="OptionsButtonTemplate" text="YES">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="44" y="14" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_ClearRecords()
+						CCT_RecordsConfirmFrame:Hide()
+						CCT_OptionsFrame:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentNOButton" inherits="OptionsButtonTemplate" text="NO">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT" x="-44" y="14" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_RecordsConfirmFrame:Hide()
+						CCT_OptionsFrame:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	<Button name="CCT_MinimapButton" parent="Minimap" toplevel="true" movable="true" frameStrata="HIGH" enableMouse="true">
+		<Size x="32" y="32" />
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Minimap" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="-13" y="5" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer>
+				<Texture name="$parentTexture" file="Interface\AddOns\CombatCritTracker\CCTMinimapButton">
+					<Size x="32" y="32" />
+					<Anchors>
+						<Anchor point="TOPLEFT" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parent_DragFrame" hidden="true">
+				<Scripts>
+					<OnUpdate>
+						CCT_MinimapButton_DragFrame_OnUpdate()
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+				self:RegisterForDrag("LeftButton")
+			</OnLoad>
+			<OnClick>
+				CCT_MinimapButton_OnClick(self, button)
+			</OnClick>
+			<OnDragStart>
+				if CCTSavedVars[CCT_PlayerRealm][CCT_PlayerName].MinimapButtonUnlocked == "true" then
+					CCT_MinimapButton_DragFrame:Show()
+				end
+			</OnDragStart>
+			<OnDragStop>
+					CCT_MinimapButton_DragFrame:Hide()
+			</OnDragStop>
+			<OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+				CCT_MinimapButton_Tooltip()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+		<HighlightTexture file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight" alphaMode="ADD" />
+	</Button>
+	<MessageFrame name="CCT_MessageFrame" parent="UIParent" toplevel="true" movable="true" frameStrata="BACKGROUND" insertMode="TOP" displayDuration="3" fadeDuration="1">
+		<Size x="300" y="180" />
+		<Anchors>
+			<Anchor point="CENTER" x="-300" y="0" />
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
+			<Color r="1" g="1" b="1" a="0" />
+		</Backdrop>
+		<FontString name="$parentFontString" font="Fonts\skurri.ttf" outline="THICK" virtual="true">
+			<FontHeight>
+				<AbsValue val="18"/>
+			</FontHeight>
+			<Color r="1" g="1" b="1"/>
+		</FontString>
+	</MessageFrame>
+	<MessageFrame name="CCT_BGMessageFrame" parent="UIParent" toplevel="true" movable="true" frameStrata="BACKGROUND" insertMode="TOP" displayDuration="3" fadeDuration="1">
+		<Size x="300" y="100" />
+		<Anchors>
+			<Anchor point="TOP" x="0" y="-160" />
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
+			<Color r="1" g="1" b="1" a="0" />
+		</Backdrop>
+		<FontString name="$parentFontString" font="Fonts\skurri.ttf" outline="THICK" virtual="true">
+			<FontHeight>
+				<AbsValue val="18"/>
+			</FontHeight>
+			<Color r="1" g="1" b="1"/>
+		</FontString>
+		<Frames>
+			<Frame name="CCT_TimerFrame" hidden="true">
+				<Scripts>
+					<OnUpdate>
+						CCT_TimerFrame_OnUpdate()
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</MessageFrame>
+	<Frame name="CCT_RecordsFrame" inherits="BasicFrameTemplateWithInset" parent="UIParent" hidden="true" toplevel="true" movable="true" frameStrata="LOW" enableMouse="true">
+		<Size x="280" y="400"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitleText" inherits="GameFontNormal" text="Crit Records">
+					<Size x="120" y="14"/>
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-6"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontNormalLarge" justifyH="LEFT" justifyV="TOP">
+					<Size x="260" y="330"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="10" y="-34"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentClearRecords" inherits="OptionsButtonTemplate" text="Clear Records">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="10" y="10"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_RecordsFrame:Hide()
+						CCT_RecordsConfirmFrame:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentClose" inherits="OptionsButtonTemplate" text="Close">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-10" y="10"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_RecordsFrame:Hide()
+						CCT_OptionsFrame:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForDrag("LeftButton")
+				tinsert(UISpecialFrames, "CCT_RecordsFrame")
+			</OnLoad>
+			<OnShow>
+				CCT_RecordsFrame_OnShow()
+				PlaySound(839)
+			</OnShow>
+			<OnHide>
+				PlaySound(840)
+			</OnHide>
+			<OnDragStart>
+				self:StartMoving()
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing()
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	<Frame name="CCT_OptionsFrame" inherits="BasicFrameTemplateWithInset" parent="UIParent" hidden="true" toplevel="true" movable="true" frameStrata="LOW" enableMouse="true">
+		<Size x="615" y="530" />
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<Frame name="$parentInset1" inherits="CCTInsetFrameTemplate" useParentLevel="true">
+				<Size x="280" y="260"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="14" y="-30"/>
+				</Anchors>
+			</Frame>
+			<CheckButton name="$parentCheck11" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentInset1" relativePoint="TOPLEFT" x="5" y="-24" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("EnableCombatLog", "true")
+						else
+						CCT_setVar("EnableCombatLog", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck12" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck11" relativePoint="BOTTOM" x="10" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("CombatLogShowCrits", "true")
+						else
+						CCT_setVar("CombatLogShowCrits", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck13" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck12" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("CombatLogMergeNormal", "true")
+						else
+						CCT_setVar("CombatLogMergeNormal", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck14" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck13" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("CombatLogRecordBreak", "true")
+						else
+						CCT_setVar("CombatLogRecordBreak", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider name="$parentLogThreshSlider" inherits="OptionsSliderTemplate" minValue="1" maxValue="22" valueStep="1" ObeyStepOnDrag="true" >
+				<Size x="220" y="17" />
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentInset1" relativePoint="BOTTOMLEFT" x="24" y="30" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."High"):SetText("22")
+						getglobal(self:GetName().."Low"):SetText(1)
+					</OnLoad>
+					<OnValueChanged>
+						CCT_LogThreshSlider_OnValueChanged(self)
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+						CCT_Helper_Tooltip(self)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Frame name="$parentInset2" inherits="CCTInsetFrameTemplate" useParentLevel="true">
+				<Size x="280" y="260"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentInset1" relativePoint="TOPRIGHT" x="28" y="0"/>
+				</Anchors>
+			</Frame>
+			<CheckButton name="$parentCheck21" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentInset2" relativePoint="TOPLEFT" x="5" y="-24" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("EnableSound", "true")
+						else
+						CCT_setVar("EnableSound", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck22" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck21" relativePoint="BOTTOM" x="10" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("CritSound", "true")
+						else
+						CCT_setVar("CritSound", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck23" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck22" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("MergeNormalSound", "true")
+						else
+						CCT_setVar("MergeNormalSound", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck24" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck23" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("RecordBreakSound", "true")
+						else
+						CCT_setVar("RecordBreakSound", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck25" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck24" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("FinishHimSound", "true")
+						else
+						CCT_setVar("FinishHimSound", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider name="$parentSoundThreshSlider" inherits="OptionsSliderTemplate" minValue="1" maxValue="22" valueStep="1" ObeyStepOnDrag="true" >
+				<Size x="220" y="17" />
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentInset2" relativePoint="BOTTOMLEFT" x="24" y="30" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."High"):SetText(22)
+						getglobal(self:GetName().."Low"):SetText(1)
+					</OnLoad>
+					<OnValueChanged>
+						CCT_SoundThreshSlider_OnValueChanged(self)
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+						CCT_Helper_Tooltip(self)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Frame name="$parentInset3" inherits="CCTInsetFrameTemplate" useParentLevel="true">
+				<Size x="280" y="210"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentInset1" relativePoint="BOTTOM" x="0" y="-10"/>
+				</Anchors>
+			</Frame>
+			<CheckButton name="$parentCheck31" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentInset3" relativePoint="TOPLEFT" x="5" y="-24" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("ResetCritCountAfterFight", "true")
+						else
+						CCT_setVar("ResetCritCountAfterFight", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck32" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck31" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("TrackHealing", "true")
+						else
+						CCT_setVar("TrackHealing", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Button name="$parentRecordsButton" inherits="OptionsButtonTemplate" text="Records">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentInset3" relativePoint="BOTTOMLEFT" x="10" y="10"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_OptionsFrame:Hide()
+						CCT_RecordsFrame:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentClearRecords" inherits="OptionsButtonTemplate" text="Clear Records">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parentInset3" relativePoint="BOTTOMRIGHT" x="-10" y="10"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_OptionsFrame:Hide()
+						CCT_RecordsConfirmFrame:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="$parentInset4" inherits="CCTInsetFrameTemplate" useParentLevel="true">
+				<Size x="280" y="210"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentInset2" relativePoint="BOTTOM" x="0" y="-10"/>
+				</Anchors>
+			</Frame>
+			<CheckButton name="$parentCheck41" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentInset4" relativePoint="TOPLEFT" x="5" y="-24" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("BGMatchStart", "true")
+						else
+						CCT_setVar("BGMatchStart", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck42" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck41" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("BGKillingBlows", "true")
+						else
+						CCT_setVar("BGKillingBlows", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck43" inherits="CCTCheckBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCheck42" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if self:GetChecked() then
+						CCT_setVar("BGFlagsScore", "true")
+						else
+						CCT_setVar("BGFlagsScore", "false")
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Button name="$parentCloseButton" inherits="OptionsButtonTemplate" text="Close">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parentInset4" relativePoint="BOTTOMRIGHT" x="-10" y="10"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_OptionsFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitleText" inherits="GameFontNormal" text="Combat Crit Tracker">
+					<Size x="120" y="14"/>
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-6" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInset1Title" inherits="GameFontNormal" text="Combat Log">
+					<Size x="280" y="14"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInset1" relativePoint="TOPLEFT" x="5" y="-5"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText11" inherits="GameFontNormalSmall" text="Enable Combat Log" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck11" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText12" inherits="GameFontNormalSmall" text="Critical Hits" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck12" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText13" inherits="GameFontNormalSmall" text="AutoAttack Crits" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck13" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText14" inherits="GameFontNormalSmall" text="Record Break" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck14" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInset2Title" inherits="GameFontNormal" text="Sound Effects">
+					<Size x="280" y="14"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInset2" relativePoint="TOPLEFT" x="5" y="-5"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText21" inherits="GameFontNormalSmall" text="Enable Sounds" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck21" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText22" inherits="GameFontNormalSmall" text="Critical Hits" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck22" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText23" inherits="GameFontNormalSmall" text="AutoAttack Crits" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck23" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText24" inherits="GameFontNormalSmall" text="Record Break" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck24" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText25" inherits="GameFontNormalSmall" text="Finish Him" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck25" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInset3Title" inherits="GameFontNormal" text="Tracking Options">
+					<Size x="280" y="14"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInset3" relativePoint="TOPLEFT" x="5" y="-5"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText31" inherits="GameFontNormalSmall" text="Reset Crit Count After Fight" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck31" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText32" inherits="GameFontNormalSmall" text="Healing Spells" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck32" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInset4Title" inherits="GameFontNormal" text="Battlegrounds">
+					<Size x="280" y="14"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInset4" relativePoint="TOPLEFT" x="5" y="-5"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText41" inherits="GameFontNormalSmall" text="Match Start Announcement" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck41" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText42" inherits="GameFontNormalSmall" text="Killing Blows" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck42" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText43" inherits="GameFontNormalSmall" text="Flags and Scoring" justifyH="LEFT">
+					<Size x="240" y="14" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCheck43" relativePoint="RIGHT" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForDrag("LeftButton")
+				tinsert(UISpecialFrames, "CCT_OptionsFrame")
+			</OnLoad>
+			<OnShow>
+				CCT_OptionsFrame_OnShow(self)
+				PlaySound(839)
+			</OnShow>
+			<OnHide>
+				PlaySound(840)
+			</OnHide>
+			<OnDragStart>
+				self:StartMoving()
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing()
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+</Ui>
