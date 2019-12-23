@@ -596,8 +596,6 @@ end
 -- Options Frame
 --------------------------------------------
 function CCT_OptionsFrame_OnShow(self)
-	CCT_OptionsFrameLogThreshSlider:SetValue(CCT_getVar("LogThresh"))
-	CCT_OptionsFrameSoundThreshSlider:SetValue(CCT_getVar("SoundThresh"))
 
 	if CCT_getVar("EnableCombatLog") == "true" then
 		CCT_OptionsFrameCheck11:SetChecked(true)
@@ -674,14 +672,22 @@ function CCT_OptionsFrame_OnShow(self)
 	end
 end
 
+	CCT_OptionsFrameLogThreshSliderText:SetText("Crit Log Threshold")
+	CCT_OptionsFrameLogThreshSlider:SetValue(CCT_getVar("LogThresh"))
+	CCT_OptionsFrameLogThreshTextButton:SetText(CCT_getVar("LogThresh"))
+
 function CCT_LogThreshSlider_OnValueChanged(self)
 	CCT_setVar("LogThresh", self:GetValue())
-	getglobal(self:GetName().."Text"):SetText("Log Crit Threshold : "..CCT_getVar("LogThresh"))
+	CCT_OptionsFrameLogThreshTextButton:SetText(CCT_getVar("LogThresh"))
 end
+
+	CCT_OptionsFrameSoundThreshSliderText:SetText("Crit Sound Threshold")
+	CCT_OptionsFrameSoundThreshSlider:SetValue(CCT_getVar("SoundThresh"))
+	CCT_OptionsFrameSoundThreshTextButton:SetText(CCT_getVar("SoundThresh"))
 
 function CCT_SoundThreshSlider_OnValueChanged(self)
 	CCT_setVar("SoundThresh", self:GetValue())
-	getglobal(self:GetName().."Text"):SetText("Sound Crit Threshold : "..CCT_getVar("SoundThresh"))
+	CCT_OptionsFrameSoundThreshTextButton:SetText(CCT_getVar("SoundThresh"))
 end
 
 function CCT_Helper_Tooltip(self)
@@ -781,22 +787,27 @@ end
 -- Message Frame Helper
 -------------------------------------------
 function CCT_MessageFrameHelper_OnShow()
+	CCT_MessageFrameHelperFontSliderText:SetText("Crit Font Size")
 	CCT_MessageFrameHelperFontSlider:SetValue(CCT_getVar("LogFontSize"))
+	CCT_MessageFrameHelperFontSliderTextButton:SetText(CCT_getVar("LogFontSize"))
+
+	CCT_MessageFrameHelperBGFontSliderText:SetText("Battleground Font Size")
 	CCT_MessageFrameHelperBGFontSlider:SetValue(CCT_getVar("BGLogFontSize"))
+	CCT_MessageFrameHelperBGFontSliderTextButton:SetText(CCT_getVar("BGLogFontSize"))
 end
 
 function CCT_FontSlider_OnValueChanged(self)
 	CCT_setVar("LogFontSize", self:GetValue())
 	local fontName, fontHeight, fontFlags = CCT_MessageFrame:GetFont()
 	CCT_MessageFrame:SetFont(fontName, self:GetValue(), fontFlags)
-	getglobal(self:GetName().."Text"):SetText("Log Font Size : "..CCT_getVar("LogFontSize"))
+	CCT_MessageFrameHelperFontSliderTextButton:SetText(CCT_getVar("LogFontSize"))
 end
 
 function CCT_BGFontSlider_OnValueChanged(self)
 	CCT_setVar("BGLogFontSize", self:GetValue())
 	local BGfontName, BGfontHeight, BGfontFlags = CCT_BGMessageFrame:GetFont()
 	CCT_BGMessageFrame:SetFont(BGfontName, self:GetValue(), BGfontFlags)
-	getglobal(self:GetName().."Text"):SetText("Battleground Font Size : "..CCT_getVar("BGLogFontSize"))
+	CCT_MessageFrameHelperBGFontSliderTextButton:SetText(CCT_getVar("BGLogFontSize"))
 end
 
 function CCT_MessageFrameHelperTestButton_OnClick()
@@ -805,16 +816,25 @@ function CCT_MessageFrameHelperTestButton_OnClick()
 	CCT_BGMessageFrame:AddMessage("The enemy has your flag!", CCT_getVar("CCT_BG_RED"), CCT_getVar("CCT_BG_GREEN"), CCT_getVar("CCT_BG_BLUE"))
 end
 
-function CCT_MessageFrameHelperColorButton_OnClick()
+function CCT_MessageFrameHelperFontColorButton_OnClick()
 	ColorPickerFrame:SetColorRGB(CCT_getVar("CCT_RED"), CCT_getVar("CCT_GREEN"), CCT_getVar("CCT_BLUE"), 1)
 	ColorPickerFrame.hasOpacity = nil
 	ColorPickerFrame.previousValues = {CCT_getVar("CCT_RED"), CCT_getVar("CCT_GREEN"), CCT_getVar("CCT_BLUE"), 1}
-	ColorPickerFrame.func, ColorPickerFrame.cancelFunc = CCT_ColorCallBack, CCT_ColorCallBack
+	ColorPickerFrame.func, ColorPickerFrame.cancelFunc = CCT_FontColorCallBack, CCT_FontColorCallBack
 	ColorPickerFrame:Hide()
 	ColorPickerFrame:Show()
 end
 
-function CCT_ColorCallBack(restore)
+function CCT_MessageFrameHelperBGFontColorButton_OnClick()
+	ColorPickerFrame:SetColorRGB(CCT_getVar("CCT_BG_RED"), CCT_getVar("CCT_BG_GREEN"), CCT_getVar("CCT_BG_BLUE"), 1)
+	ColorPickerFrame.hasOpacity = nil
+	ColorPickerFrame.previousValues = {CCT_getVar("CCT_BG_RED"), CCT_getVar("CCT_BG_GREEN"), CCT_getVar("CCT_BG_BLUE"), 1}
+	ColorPickerFrame.func, ColorPickerFrame.cancelFunc = CCT_BGFontColorCallBack, CCT_BGColorCallBack
+	ColorPickerFrame:Hide()
+	ColorPickerFrame:Show()
+end
+
+function CCT_FontColorCallBack(restore)
 	local newR, newG, newB, newA
 	if restore then
 		newR, newG, newB, newA = unpack(restore)
@@ -825,6 +845,19 @@ function CCT_ColorCallBack(restore)
 	CCT_setVar("CCT_GREEN", newG)
 	CCT_setVar("CCT_BLUE", newB)
 	CCT_MessageFrameFontString:SetTextColor(CCT_getVar("CCT_RED"), CCT_getVar("CCT_GREEN"), CCT_getVar("CCT_BLUE"), 1)
+end
+
+function CCT_BGFontColorCallBack(restore)
+	local newR, newG, newB, newA
+	if restore then
+		newR, newG, newB, newA = unpack(restore)
+	else
+		newR, newG, newB = ColorPickerFrame:GetColorRGB()
+	end
+	CCT_setVar("CCT_BG_RED", newR)
+	CCT_setVar("CCT_BG_GREEN", newG)
+	CCT_setVar("CCT_BG_BLUE", newB)
+	CCT_BGMessageFrameFontString:SetTextColor(CCT_getVar("CCT_BG_RED"), CCT_getVar("CCT_BG_GREEN"), CCT_getVar("CCT_BG_BLUE"), 1)
 end
 
 function CCT_MessageFrameHelperCloseButton_OnClick()

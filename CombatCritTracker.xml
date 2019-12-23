@@ -17,6 +17,35 @@
 			</OnLeave>
 		</Scripts>
 	</CheckButton>
+	<Button name="CCTSliderTextButtonTemplate" enableMouse="false" virtual="true">
+		<NormalFont style="GameFontHighlight"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="20"/>
+					<Anchors>
+						<Anchor point="LEFT" x="-5" y="0"/>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+					<Size x="8" y="20"/>
+					<Anchors>
+						<Anchor point="RIGHT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+					<Size x="10" y="20"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
 	<Frame name="CCTInsetFrameTemplate" virtual="true">
 		<Layers>
 			<Layer level="BORDER">
@@ -84,7 +113,7 @@
 		</Layers>
 	</Frame>
 	<Frame name="CCT_MessageFrameHelper" hidden="true" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" moveable="true" enableMouse="true">
-		<Size x="328" y="210" />
+		<Size x="328" y="220" />
 		<Anchors>
 			<Anchor point="TOPLEFT" x="50" y="-30" />
 		</Anchors>
@@ -112,7 +141,7 @@
 						<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="TOP" x="0" y="-14" />
 					</Anchors>
 				</FontString>
-				<FontString name="$parentText" inherits="GameFontHighlight" text="Drag the frames below to move">
+				<FontString name="$parentText" inherits="GameFontHighlight" text="Drag the frames to move">
 					<Size x="286" y="24" />
 					<Anchors>
 						<Anchor point="TOP" x="3" y="-32" />
@@ -122,9 +151,9 @@
 		</Layers>
 		<Frames>
 			<Slider name="$parentFontSlider" inherits="OptionsSliderTemplate" minValue="8" maxValue="32" valueStep="1" ObeyStepOnDrag="true" >
-				<Size x="220" y="18" />
+				<Size x="224" y="18" />
 				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="46" y="105" />
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="52" y="125" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
@@ -136,10 +165,26 @@
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
-			<Slider name="$parentBGFontSlider" inherits="OptionsSliderTemplate" minValue="8" maxValue="32" valueStep="1" ObeyStepOnDrag="true" >
-				<Size x="220" y="18" />
+			<Button name="$parentFontSliderTextButton" inherits="CCTSliderTextButtonTemplate">
+				<Size x="70" y="14"/>
 				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="46" y="60" />
+					<Anchor point="TOPLEFT" relativeTo="$parentFontSlider" relativePoint="BOTTOMLEFT" x="28" y="-4"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentFontColorButton" inherits="OptionsButtonTemplate" text="Color">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentFontSlider" relativePoint="BOTTOMRIGHT" x="-20" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_MessageFrameHelperFontColorButton_OnClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Slider name="$parentBGFontSlider" inherits="OptionsSliderTemplate" minValue="8" maxValue="32" valueStep="1" ObeyStepOnDrag="true" >
+				<Size x="224" y="18" />
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="52" y="60" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
@@ -151,6 +196,22 @@
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
+			<Button name="$parentBGFontSliderTextButton" inherits="CCTSliderTextButtonTemplate">
+				<Size x="70" y="14"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentBGFontSlider" relativePoint="BOTTOMLEFT" x="28" y="-4"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBGFontColorButton" inherits="OptionsButtonTemplate" text="Color">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentBGFontSlider" relativePoint="BOTTOMRIGHT" x="-20" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CCT_MessageFrameHelperBGFontColorButton_OnClick()
+					</OnClick>
+				</Scripts>
+			</Button>
 			<Button name="$parentTestButton" inherits="OptionsButtonTemplate" text="Test">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="14" y="14" />
@@ -158,16 +219,6 @@
 				<Scripts>
 					<OnClick>
 						CCT_MessageFrameHelperTestButton_OnClick()
-					</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentColorButton" inherits="OptionsButtonTemplate" text="Text Color">
-				<Anchors>
-					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM" x="0" y="14" />
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						CCT_MessageFrameHelperColorButton_OnClick()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -513,6 +564,12 @@
 					</OnLeave>
 				</Scripts>
 			</Slider>
+			<Button name="$parentLogThreshTextButton" inherits="CCTSliderTextButtonTemplate">
+				<Size x="70" y="14"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentLogThreshSlider" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
 			<Frame name="$parentInset2" inherits="CCTInsetFrameTemplate" useParentLevel="true">
 				<Size x="280" y="260"/>
 				<Anchors>
@@ -611,6 +668,12 @@
 					</OnLeave>
 				</Scripts>
 			</Slider>
+			<Button name="$parentSoundThreshTextButton" inherits="CCTSliderTextButtonTemplate">
+				<Size x="70" y="14"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentSoundThreshSlider" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
 			<Frame name="$parentInset3" inherits="CCTInsetFrameTemplate" useParentLevel="true">
 				<Size x="280" y="210"/>
 				<Anchors>
@@ -727,7 +790,7 @@
 			</Button>
 		</Frames>
 		<Layers>
-			<Layer level="ARTWORK">
+			<Layer level="OVERLAY">
 				<FontString name="$parentTitleText" inherits="GameFontNormal" text="Combat Crit Tracker">
 					<Size x="120" y="14"/>
 					<Anchors>
